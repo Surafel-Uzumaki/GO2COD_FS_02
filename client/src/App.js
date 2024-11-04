@@ -5,8 +5,8 @@ import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Footer from "./components/Footer";
-import EditProduct from "./pages/EditProduct"; // Your existing edit products page
-import EditSingleProduct from "./pages/EditSingleProduct"; // New edit single product page
+import EditProduct from "./pages/EditProduct"; 
+
 
 const App = () => {
   return (
