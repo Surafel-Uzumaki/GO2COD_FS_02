@@ -2,6 +2,8 @@ const express = require("express");
 const Product = require("../models/Product");
 const router = express.Router();
 const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -43,16 +45,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
-  try {
-    const newProduct = new Product(req.body);
-    const savedProduct = await newProduct.save();
-    res.status(201).json(savedProduct);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
 router.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -64,26 +56,26 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 router.put("/:id", upload.single("image"), async (req, res) => {
-  console.log(`Updating product with ID: ${req.params.id}`);
   const { id } = req.params;
 
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      {
-        name: req.body.name,
-        description: req.body.description,
-        price: req.body.price,
-        image: req.file ? `uploads/${req.file.filename}` : product.image,
-      },
-      { new: true }
-    );
-
-    if (!updatedProduct) {
+    const product = await Product.findById(id);
+    if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
+    const updatedData = {
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      image: req.file ? req.file.filename : product.image,
+    };
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, {
+      new: true,
+    });
     res.status(200).json(updatedProduct);
   } catch (error) {
     console.error(error);
@@ -99,13 +91,8 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Delete the image file if it exists
     if (product.image) {
-      const imagePath = path.join(
-        __dirname,
-        "../uploads",
-        product.image.split("/uploads/")[1]
-      );
+      const imagePath = path.join(__dirname, "../uploads", product.image);
       fs.unlink(imagePath, (err) => {
         if (err) {
           console.error("Error deleting image file:", err);
@@ -113,7 +100,6 @@ router.delete("/:id", async (req, res) => {
       });
     }
 
-    // Delete the product from the database
     await product.deleteOne();
     res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {

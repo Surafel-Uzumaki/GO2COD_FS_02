@@ -1,10 +1,13 @@
+// src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
-import Cart from "./pages/Cart"; // Ensure this component exists
+import Cart from "./pages/Cart";
 import Footer from "./components/Footer";
+import EditProduct from "./pages/EditProduct"; // Your existing edit products page
+import EditSingleProduct from "./pages/EditSingleProduct"; // New edit single product page
 
 const App = () => {
   return (
@@ -14,6 +17,9 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/edit-products" element={<EditProduct />} />
+        <Route path="/edit/:id" element={<EditSingleProduct />} />{" "}
+        {/* New route for editing a single product */}
       </Routes>
       <Footer />
     </Router>

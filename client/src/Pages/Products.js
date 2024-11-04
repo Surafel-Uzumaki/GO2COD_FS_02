@@ -7,6 +7,10 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { state } = useCart();
+  const { items } = state;
+
+  const [expandedProduct, setExpandedProduct] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -25,7 +29,21 @@ const Products = () => {
 
   const handleAddToCart = (product) => {
     dispatch({ type: "ADD_TO_CART", payload: product });
-    alert(`${product.name} has been added to your cart!`);
+
+    product.addedToCart = true;
+
+    setTimeout(() => {
+      product.addedToCart = false;
+      setProducts([...products]);
+    }, 1000);
+  };
+
+  const toggleDescription = (id) => {
+    if (expandedProduct === id) {
+      setExpandedProduct(null);
+    } else {
+      setExpandedProduct(id);
+    }
   };
 
   if (loading) {
@@ -37,27 +55,48 @@ const Products = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {products.map((product) => (
-        <div key={product._id} className="border p-4 rounded-lg shadow-lg">
-          <img
-            src={`http://localhost:5000/uploads/${product.image}`}
-            alt={product.name}
-            className="w-full h-32 object-contain"
-          />
-          <h3 className="font-semibold">{product.name}</h3>
-          <p>{product.description}</p>
-          <p className="text-lg font-bold">
-            ${(product.price / 100).toFixed(2)}
-          </p>
-          <button
-            onClick={() => handleAddToCart(product)}
-            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+    <div className="container mx-auto px-4">
+      {/* Centered heading */}
+      <h1 className="text-3xl font-bold text-center my-8">Products</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {products.map((product) => (
+          <div
+            key={product._id}
+            className="border p-4 rounded-lg shadow-lg mb-4"
           >
-            Add to Cart
-          </button>
-        </div>
-      ))}
+            <img
+              src={`http://localhost:5000/uploads/${product.image}`}
+              alt={product.name}
+              className="w-full h-32 object-contain"
+            />
+            <h3 className="font-semibold">{product.name}</h3>
+
+            <p
+              onClick={() => toggleDescription(product._id)}
+              className="cursor-pointer"
+            >
+              {expandedProduct === product._id
+                ? product.description
+                : `${product.description.slice(0, 50)}...`}
+            </p>
+            <p className="text-lg font-bold">
+              ${(product.price / 100).toFixed(2)}
+            </p>
+            <button
+              onClick={() => handleAddToCart(product)}
+              className="mt-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-900"
+            >
+              Add to Cart
+            </button>
+
+            {product.addedToCart && (
+              <div className="mt-2 text-red-500 font-semibold">
+                Added to cart
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

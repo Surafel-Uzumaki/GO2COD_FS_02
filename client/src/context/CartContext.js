@@ -51,6 +51,39 @@ function cartReducer(state, action) {
         totalPrice: calculateTotalPrice(itemsWithUpdatedQuantity),
       };
 
+    case "ADD_PRODUCT":
+      // Add a new product to the list of items
+      return {
+        ...state,
+        items: [...state.items, { ...action.payload, quantity: 1 }],
+        totalPrice: calculateTotalPrice([
+          ...state.items,
+          { ...action.payload, quantity: 1 },
+        ]),
+      };
+
+    case "UPDATE_PRODUCT":
+      // Update an existing product's details
+      const updatedItemsList = state.items.map((item) =>
+        item._id === action.payload._id ? { ...item, ...action.payload } : item
+      );
+      return {
+        ...state,
+        items: updatedItemsList,
+        totalPrice: calculateTotalPrice(updatedItemsList),
+      };
+
+    case "DELETE_PRODUCT":
+      // Remove a product from the items
+      const remainingItems = state.items.filter(
+        (item) => item._id !== action.payload._id
+      );
+      return {
+        ...state,
+        items: remainingItems,
+        totalPrice: calculateTotalPrice(remainingItems),
+      };
+
     default:
       return state;
   }
