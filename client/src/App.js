@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
-import Cart from "./pages/Cart";
+
 import Footer from "./components/Footer";
 import EditProduct from "./pages/EditProduct"; 
+import EditSingleProduct from "./pages/EditSingleProduct"; 
 
 
 const App = () => {
